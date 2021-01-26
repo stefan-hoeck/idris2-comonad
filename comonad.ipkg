@@ -1,4 +1,4 @@
-package quickcheck
+package comonad
 
 sourcedir  = "src"
 depends    = base
