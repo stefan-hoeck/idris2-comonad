@@ -1,0 +1,6 @@
+package comonad-doc
+
+sourcedir  = "src"
+depends    = base
+
+modules = Doc.Traced
