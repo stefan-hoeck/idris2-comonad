@@ -1,0 +1,16 @@
+package quickcheck
+
+sourcedir  = "src"
+depends    = base
+
+modules = Control.Comonad
+        , Control.Comonad.Env
+        , Control.Comonad.Env.Env
+        , Control.Comonad.Env.Interface
+        , Control.Comonad.Store
+        , Control.Comonad.Store.Interface
+        , Control.Comonad.Store.Store
+        , Control.Comonad.Traced
+        , Control.Comonad.Traced.Interface
+        , Control.Comonad.Traced.Traced
+        , Control.Comonad.Trans
