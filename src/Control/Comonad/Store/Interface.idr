@@ -3,6 +3,7 @@ module Control.Comonad.Store.Interface
 import Control.Comonad
 import Control.Comonad.Env.Env
 import Control.Comonad.Store.Store
+import Control.Comonad.Traced.Traced
 import Control.Comonad.Trans
 
 %default total
@@ -60,14 +61,8 @@ Comonad w => ComonadStore s (StoreT s w) where
   seeks f                      = record { val $= f }
   experiment f (MkStoreT wf s) = extract wf <$> f s
 
--- 
--- instance ComonadStore s w => ComonadStore s (IdentityT w) where
---   pos = lowerPos
---   peek = lowerPeek
---   experiment = lowerExperiment
--- 
--- 
--- instance (ComonadStore s w, Monoid m) => ComonadStore s (TracedT m w) where
---   pos = lowerPos
---   peek = lowerPeek
---   experiment = lowerExperiment
+public export %inline
+(ComonadStore s w, Monoid m) => ComonadStore s (TracedT m w) where
+  pos        = lowerPos
+  peek       = lowerPeek
+  experiment = lowerExperiment
