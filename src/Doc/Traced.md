@@ -1,13 +1,17 @@
 ## The `Traced` Comonad
 
+In this post I'll have a look at the `Traced` comonad and
+its uses as a functional analogue to the builder pattern
+from object oriented programming.
+
+This is a literate Idris2 file, therefore:
+
 ```idris
 module Doc.Traced
 
 import Control.Comonad
 import Control.Comonad.Traced
 import Control.Monad.Identity
-
-import Data.DPair
 ```
 
 ### The Builder Pattern
