@@ -211,8 +211,8 @@ Builder c = Traced (List $ Setting c)
 runWith : m -> Traced m a -> a
 runWith = flip runTraced
 
-blank : (c : Class) -> Builder c (HeroC c)
-blank c = traced (dummy c)
+blank : {c : Class} -> Builder c (HeroC c)
+blank {c} = traced (dummy c)
 
 warrior : Builder Warrior a -> a
 warrior = runWith [ HitPoint     $> (+10)
@@ -248,14 +248,14 @@ name : String -> Builder c a -> a
 name g = runWith [Name :> g]
 
 orshosh : HeroC Warrior
-orshosh = extract $   blank Warrior
+orshosh = extract $   blank
                   =>> warrior
                   =>> halfOrc
                   =>> gender Male
                   =>> name "Orshosh"
 
 lucie : HeroC Wizard
-lucie = extract $   blank Wizard
+lucie = extract $   blank
                 =>> wizard
                 =>> elf
                 =>> gender Female
