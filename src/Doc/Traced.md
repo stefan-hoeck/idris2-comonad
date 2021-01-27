@@ -70,10 +70,9 @@ type level, but we'd still rather not burden users of our
 library with such bookkeeping.
 
 We therefore need a way to safely and conveniently
-build `Hero` values. For this, we define an
+build `Hero` values. For this, we define a
 `Field` data type we can use to adjust hero
-fields. The code in the next block was a lovely
-exercise in dependently typed programming.
+fields.
 
 ```idris
 namespace Field
