@@ -22,6 +22,10 @@ data Race = Human | Elf | Dwarf | Hobbit | HalfOrc
 
 data Class = Warrior | Wizard | Thief | Cleric
 
+data Curse = MagicMissiles | Darkness | Fireball
+
+data Cure = Heal | RemoveCurse | Resurrection
+
 SpellPointsType : Class -> Type
 SpellPointsType Wizard  = Nat
 SpellPointsType Cleric  = Nat
@@ -29,8 +33,8 @@ SpellPointsType Warrior = ()
 SpellPointsType Thief   = ()
 
 SpellsType : Class -> Type
-SpellsType Wizard  = List String
-SpellsType Cleric  = List String
+SpellsType Wizard  = List Curse
+SpellsType Cleric  = List Cure
 SpellsType Warrior = ()
 SpellsType Thief   = ()
 
@@ -47,19 +51,14 @@ record HeroC (c : Class) where
   spellPoints  : SpellPointsType c
   spells       : SpellsType c
   equipment    : List String
-
-record Hero where
-  constructor MkHero
-  class  : Class
-  fields : HeroC class
 ```
 
 That's quite a large list of fields, and in reality, it could
 be much larger. We'll need some utility functions to conveniently
-create `Hero` values. In additiona, although we encoded some
+create `Hero` values. In addition, although we encoded some
 data invariants at the type level (warriors will never cast
-spells), we probably want to keep the constructor private,
-since we'd like to uphole some additional invariants.
+spells), we probably still want to keep the constructor private,
+since we'd like to uphold some additional invariants.
 For instance, me might want
 the list of spells to be sorted and contain no duplicates.
 These kind of things could (and should!) be encoded at the
@@ -68,37 +67,37 @@ library with such bookkeeping.
 
 We therefore need a way to safely and conveniently
 build `Hero` values. For this, we define an
-`Option` data type we can use to adjust hero
+`Field` data type we can use to adjust hero
 fields. The code in the next block was a lovely
 exercise in dependently typed programming.
 
 ```idris
-namespace Option
+namespace Field
   public export
-  data Option : Class -> Type -> Type where
-    Name         : Option c String
-    Gender       : Option c Gender
-    Race         : Option c Race
-    Level        : Option c Nat
-    Age          : Option c Nat
-    Strength     : Option c Nat
-    Intelligence : Option c Nat
-    HitPoint     : Option c Nat
-    SpellPoints  : Option c (SpellPointsType c)
-    Spells       : Option c (SpellsType c)
-    Equipment    : Option c (List String)
+  data Field : Class -> Type -> Type where
+    Name         : Field c String
+    Gender       : Field c Gender
+    Race         : Field c Race
+    Level        : Field c Nat
+    Age          : Field c Nat
+    Strength     : Field c Nat
+    Intelligence : Field c Nat
+    HitPoint     : Field c Nat
+    SpellPoints  : Field c (SpellPointsType c)
+    Spells       : Field c (SpellsType c)
+    Equipment    : Field c (List String)
   
 record Setting (c : Class) where
   constructor Set
-  opt : Option c t
+  fld : Field c t
   fun : t -> t
 
 infixr 4 $>, :>
 
-($>) : Option c t -> (t -> t) -> Setting c
+($>) : Field c t -> (t -> t) -> Setting c
 ($>) = Set
 
-(:>) : Option c t -> t -> Setting c
+(:>) : Field c t -> t -> Setting c
 (:>) o v = Set o (const v)
 
 set : Setting c -> HeroC c -> HeroC c
@@ -125,8 +124,9 @@ Ok, lets build some heroes.
 
 ```idris
 dummy : (c : Class) -> HeroBuilder c
-dummy c = let (sp,sps) = vals
-           in setAll (MkHeroC "name" Female Human 0 18 10 10 10 sp sps Nil)
+dummy c =
+  let (sp,sps) = vals
+   in setAll (MkHeroC "name" Female Human 0 18 10 10 10 sp sps Nil)
 
   where vals : (SpellPointsType c, SpellsType c)
         vals = case c of
@@ -136,7 +136,8 @@ dummy c = let (sp,sps) = vals
                     Warrior  => ((),())
 
 warrior1 : HeroBuilder Warrior
-warrior1 ss = dummy Warrior (ss <+> [HitPoint $> (+10), Equipment $> ("Sword" ::)])
+warrior1 ss = dummy Warrior (ss <+> [ HitPoint $> (+10)
+                                    , Equipment $> ("Sword" ::)])
 
 halfOrcWarrior1 : HeroBuilder Warrior
 halfOrcWarrior1 ss = warrior1 (ss <+>
@@ -144,9 +145,9 @@ halfOrcWarrior1 ss = warrior1 (ss <+>
 ```
 
 That's quite ugly. Half-orcs are not always warriors. So we'll also
-need `halfOrcWizard` eventually. This does not compose well
-and leads to an explosion of combinations. What we'd actually like,
-is some way to apply additional settings to an existing builder:
+need `halfOrcWizard` eventually. This does not compose at all
+and leads to an explosion of combinations. Perhaps we need
+a way to apply additional settings to an existing builder:
 
 ```idris
 warrior2 : HeroBuilder Warrior -> HeroC Warrior
@@ -165,37 +166,40 @@ then concatenate using function composition. Can we use our
 already defined functions in such a new way?
 
 ```idris
-extended : (HeroBuilder c -> HeroC c) -> HeroBuilder c -> HeroBuilder c
-extended makeHero builder settings =
+extendBuilder : (HeroBuilder c -> HeroC c) -> HeroBuilder c -> HeroBuilder c
+extendBuilder makeHero builder settings =
   makeHero (\ss => builder (ss <+> settings))
 
 runBuilder : HeroBuilder c -> HeroC c
 runBuilder f = f []
 
 orshosh1 : HeroC Warrior
-orshosh1 = runBuilder ( extended warrior2 
-                      . extended halfOrc2 
-                      . extended male2 $ dummy Warrior
+orshosh1 = runBuilder ( extendBuilder warrior2 
+                      . extendBuilder halfOrc2 
+                      . extendBuilder male2 $ dummy Warrior
                       )
 ```
 
 That's slightly better. But there seems to be a pattern hidden
-here. And we need better syntax. The pattern is the following:
+here. And we need better syntax. Sounds like an interface we
+are looking for. The pattern is the following:
 
 ```idris
 run : Monoid m => (m -> a) -> a
 run f = f neutral
 
 doExtend : Semigroup m => ((m -> a) -> b) -> (m -> a) -> (m -> b)
-doExtend f g h = f (\m => g (m <+> h))
+doExtend mab ma = \m => mab (\m1 => ma (m <+> m1))
 ```
 
 ### Enter `Traced`
 
 Functions `run` and `doExtend` are part of an interface called
 `Comonad`, the categorical dual to `Monad`. The comonad representing
-this builder example is the `Traced` comonad. Let's give it
-a try:
+our builder example is the `Traced` comonad. (Actually, `TracedT`
+is a comonad transformer. We could also use `Morphism`
+from `Data.Morphism`, which behaves like `TracedT` over
+`Identity`.) Let's give it a try:
 
 ```idris
 Builder : Class -> Type -> Type
@@ -208,13 +212,31 @@ blank : (c : Class) -> Builder c (HeroC c)
 blank c = traced (dummy c)
 
 warrior : Builder Warrior a -> a
-warrior = runWith [HitPoint $> (+10), Equipment $> ("Sword" ::)]
+warrior = runWith [ HitPoint     $> (+10)
+                  , Strength     $> (+3)
+                  , Intelligence $> (`minus` 3)
+                  , Equipment    $> ("Sword" ::)
+                  ]
+
+wizard : Builder Wizard a -> a
+wizard = runWith [ HitPoint     $> (`minus` 5)
+                 , Strength     $> (`minus` 3)
+                 , Intelligence $> (+3)
+                 , SpellPoints  $> (+ 10)
+                 , Spells       $> (MagicMissiles ::)
+                 ]
 
 halfOrc : Builder c a -> a
-halfOrc = runWith [ Strength $> (+5)
+halfOrc = runWith [ Strength     $> (+5)
                   , Intelligence $> (`minus` 5)
-                  , Race :> HalfOrc
+                  , Race         :> HalfOrc
                   ]
+
+elf : Builder c a -> a
+elf = runWith [ Strength     $> (`minus` 2)
+              , Intelligence $> (+3)
+              , Race         :> Elf
+              ]
 
 gender : Gender -> Builder c a -> a
 gender g = runWith [Gender :> g]
@@ -228,4 +250,26 @@ orshosh = extract $   blank Warrior
                   =>> halfOrc
                   =>> gender Male
                   =>> name "Orshosh"
+
+lucie : HeroC Wizard
+lucie = extract $   blank Wizard
+                =>> wizard
+                =>> elf
+                =>> gender Female
+                =>> name "Lucie"
 ```
+
+This, of course, resembles the [Builder Pattern](https://en.wikipedia.org/wiki/Builder_pattern)
+from object oriented programming, and indeed, there seems to be
+an interesting connection between object oriented encapsulation
+and comonads. This is also being elaborated on
+in [a blog post by Gabriel Gonzales](https://www.haskellforall.com/2013/02/you-could-have-invented-comonads.html).
+
+While monads allow us to put data in a context, comonads
+allow us to take data out of its context. With just the `Monad`
+interface, it is impossible to get data out of its context,
+while with only the `Comonad` interface it is impossible
+to get data into a context. From this point of view, `Monad`s
+consume data while `Comonad`s produce data. Therefore, we
+probably should have a look at the link between `Comonads`
+and codata.
