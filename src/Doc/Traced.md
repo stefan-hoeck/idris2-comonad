@@ -97,10 +97,10 @@ record Setting (c : Class) where
 
 infixr 4 $>, :>
 
-($>) : Field c t -> (t -> t) -> Setting c
+($>) : Field c a -> (a -> a) -> Setting c
 ($>) = Set
 
-(:>) : Field c t -> t -> Setting c
+(:>) : Field c a -> a -> Setting c
 (:>) o v = Set o (const v)
 
 set : Setting c -> HeroC c -> HeroC c
