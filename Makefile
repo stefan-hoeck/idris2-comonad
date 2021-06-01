@@ -13,7 +13,7 @@ clean-install: clean install
 lib:
 	${IDRIS2} --build ${lib_pkg}
 
-doc:
+docs:
 	${IDRIS2} --build ${doc_pkg}
 
 install:
