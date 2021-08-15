@@ -52,7 +52,7 @@ Comonad List1 where
 public export
 Monoid e => Comonad (Morphism e) where
   extract   (Mor f) = f neutral
-  duplicate (Mor f) = Mor \e => Mor \e' => f (e <+> e')
+  duplicate (Mor f) = Mor $ \e => Mor (\e' => f (e <+> e'))
 
 --------------------------------------------------------------------------------
 --          ComonadApply

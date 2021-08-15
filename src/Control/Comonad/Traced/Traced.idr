@@ -29,11 +29,11 @@ runTraced (MkTracedT (Id f)) = f
 
 public export %inline
 listen : Functor w => TracedT m w a -> TracedT m w (a, m)
-listen = record { runTracedT $= map \f,m => (f m, m) }
+listen = record { runTracedT $= map (\f,m => (f m, m)) }
 
 public export %inline
 listens : Functor w => (m -> b) -> TracedT m w a -> TracedT m w (a, b)
-listens g = record { runTracedT $= map \f,m => (f m, g m) }
+listens g = record { runTracedT $= map (\f,m => (f m, g m)) }
 
 public export %inline
 censor : Functor w => (m -> m) -> TracedT m w a -> TracedT m w a
@@ -59,7 +59,7 @@ public export %inline
 (Comonad w, Monoid m) => Comonad (TracedT m w) where
   extract (MkTracedT wf) = extract wf neutral
   extend f =
-    record { runTracedT $= extend \w,m => f (MkTracedT $ map (. (<+> m)) w) }
+    record { runTracedT $= extend (\w,m => f (MkTracedT $ map (. (<+> m)) w)) }
 
 public export %inline
 (ComonadApply w, Monoid m) => ComonadApply (TracedT m w) where
