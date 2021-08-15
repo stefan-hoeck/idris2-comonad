@@ -4,7 +4,7 @@ lib_pkg = comonad.ipkg
 
 doc_pkg = doc.ipkg
 
-.PHONY: all lib doc install clean clean-install
+.PHONY: all lib doc install clean clean-install develop
 
 all: lib doc
 
@@ -23,3 +23,6 @@ clean:
 	${IDRIS2} --clean ${lib_pkg}
 	${IDRIS2} --clean ${doc_pkg}
 	${RM} -r build
+
+develop:
+	find -name "*.idr" | entr -d idris2 --typecheck ${lib_pkg}
