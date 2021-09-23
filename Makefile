@@ -6,7 +6,7 @@ doc_pkg = doc.ipkg
 
 
 .PHONY: all
-all: lib doc
+all: lib docs
 
 .PHONY: clean-install
 clean-install: clean install
