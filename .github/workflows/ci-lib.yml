@@ -43,7 +43,6 @@ jobs:
       max-parallel: 1 # We need sequential run!
       matrix:
         lib:
-          - elab-util
         idris-version:
           - ${{ needs.read-ver.outputs.idris-ver }}
           - latest
