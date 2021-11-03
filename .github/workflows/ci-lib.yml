@@ -42,7 +42,6 @@ jobs:
     strategy:
       max-parallel: 1 # We need sequential run!
       matrix:
-        lib:
         idris-version:
           - ${{ needs.read-ver.outputs.idris-ver }}
           - latest
