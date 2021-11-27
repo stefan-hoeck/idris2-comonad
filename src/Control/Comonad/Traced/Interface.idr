@@ -10,6 +10,7 @@ import Control.Comonad.Trans
 
 %default total
 
+public export
 interface Comonad w => ComonadTraced m w | w where
   trace : m -> w a -> a
 
