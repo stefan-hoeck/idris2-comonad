@@ -1,4 +1,4 @@
-## The `Traced` Comonad
+# The `Traced` Comonad
 
 In this post I'll have a look at the `Traced` comonad and
 its uses as a functional analogue to the builder pattern
@@ -14,7 +14,7 @@ import Control.Comonad.Traced
 import Control.Monad.Identity
 ```
 
-### The Builder Pattern
+## The Builder Pattern
 
 Assume we build a computer game with some monster-crushing
 heroes saving the world from doom.
@@ -89,7 +89,7 @@ namespace Field
     SpellPoints  : Field c (SpellPointsType c)
     Spells       : Field c (SpellsType c)
     Equipment    : Field c (List String)
-  
+
 record Setting (c : Class) where
   constructor Set
   fld : Field c t
@@ -104,17 +104,17 @@ infixr 4 $>, :>
 (:>) o v = Set o (const v)
 
 set : Setting c -> HeroC c -> HeroC c
-set (Set Name f)         = record { name $= f }
-set (Set Gender f)       = record { gender $= f }
-set (Set Race f)         = record { race $= f }
-set (Set Level f)        = record { level $= f }
-set (Set Age f)          = record { age $= f }
-set (Set Strength f)     = record { strength $= f }
-set (Set Intelligence f) = record { intelligence $= f }
-set (Set HitPoint f)     = record { hitPoints $= f }
-set (Set SpellPoints f)  = record { spellPoints $= f }
-set (Set Spells f)       = record { spells $= f }
-set (Set Equipment f)    = record { equipment $= f }
+set (Set Name f)         = { name $= f }
+set (Set Gender f)       = { gender $= f }
+set (Set Race f)         = { race $= f }
+set (Set Level f)        = { level $= f }
+set (Set Age f)          = { age $= f }
+set (Set Strength f)     = { strength $= f }
+set (Set Intelligence f) = { intelligence $= f }
+set (Set HitPoint f)     = { hitPoints $= f }
+set (Set SpellPoints f)  = { spellPoints $= f }
+set (Set Spells f)       = { spells $= f }
+set (Set Equipment f)    = { equipment $= f }
 
 HeroBuilder : Class -> Type
 HeroBuilder c = List (Setting c) -> HeroC c
@@ -177,8 +177,8 @@ runBuilder : HeroBuilder c -> HeroC c
 runBuilder f = f []
 
 orshosh1 : HeroC Warrior
-orshosh1 = runBuilder ( extendBuilder warrior2 
-                      . extendBuilder halfOrc2 
+orshosh1 = runBuilder ( extendBuilder warrior2
+                      . extendBuilder halfOrc2
                       . extendBuilder male2 $ dummy Warrior
                       )
 ```
@@ -195,7 +195,7 @@ doExtend : Semigroup m => ((m -> a) -> b) -> (m -> a) -> (m -> b)
 doExtend mab ma = \m => mab (\m1 => ma (m <+> m1))
 ```
 
-### Enter `Traced`
+## Enter `Traced`
 
 Functions `run` and `doExtend` are part of an interface called
 `Comonad`, the categorical dual to `Monad`. The comonad representing

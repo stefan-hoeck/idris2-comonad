@@ -29,15 +29,15 @@ runTraced (MkTracedT (Id f)) = f
 
 public export %inline
 listen : Functor w => TracedT m w a -> TracedT m w (a, m)
-listen = record { runTracedT $= map (\f,m => (f m, m)) }
+listen = { runTracedT $= map (\f,m => (f m, m)) }
 
 public export %inline
 listens : Functor w => (m -> b) -> TracedT m w a -> TracedT m w (a, b)
-listens g = record { runTracedT $= map (\f,m => (f m, g m)) }
+listens g = { runTracedT $= map (\f,m => (f m, g m)) }
 
 public export %inline
 censor : Functor w => (m -> m) -> TracedT m w a -> TracedT m w a
-censor g = record { runTracedT $= map (. g) }
+censor g = { runTracedT $= map (. g) }
 
 --------------------------------------------------------------------------------
 --          Interface Implementations
@@ -48,7 +48,7 @@ appEnv ff fa s = ff s (fa s)
 
 public export %inline
 Functor w => Functor (TracedT m w) where
-  map f = record { runTracedT $= map (f .) }
+  map f = { runTracedT $= map (f .) }
 
 public export %inline
 Applicative w => Applicative (TracedT m w) where
@@ -59,7 +59,7 @@ public export %inline
 (Comonad w, Monoid m) => Comonad (TracedT m w) where
   extract (MkTracedT wf) = extract wf neutral
   extend f =
-    record { runTracedT $= extend (\w,m => f (MkTracedT $ map (. (<+> m)) w)) }
+    { runTracedT $= extend (\w,m => f (MkTracedT $ map (. (<+> m)) w)) }
 
 public export %inline
 (ComonadApply w, Monoid m) => ComonadApply (TracedT m w) where

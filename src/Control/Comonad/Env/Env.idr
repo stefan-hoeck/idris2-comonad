@@ -32,7 +32,7 @@ runEnvT (MkEnvT e wa) = (e, wa)
 ||| Modifies the environment using the specified function.
 public export
 local : (e -> e') -> EnvT e w a -> EnvT e' w a
-local f = record { env $= f}
+local f = { env $= f}
 
 --------------------------------------------------------------------------------
 --          Interface Implementations

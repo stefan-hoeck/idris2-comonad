@@ -57,8 +57,8 @@ public export %inline
 Comonad w => ComonadStore s (StoreT s w) where
   pos                          = val
   peek s (MkStoreT run _)      = extract run s
-  seek s                       = record { val = s }
-  seeks f                      = record { val $= f }
+  seek s                       = { val := s }
+  seeks f                      = { val $= f }
   experiment f (MkStoreT wf s) = extract wf <$> f s
 
 public export %inline
