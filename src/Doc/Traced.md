@@ -1,4 +1,4 @@
-## The `Traced` Comonad
+# The `Traced` Comonad
 
 In this post I'll have a look at the `Traced` comonad and
 its uses as a functional analogue to the builder pattern
@@ -14,7 +14,7 @@ import Control.Comonad.Traced
 import Control.Monad.Identity
 ```
 
-### The Builder Pattern
+## The Builder Pattern
 
 Assume we build a computer game with some monster-crushing
 heroes saving the world from doom.
@@ -195,7 +195,7 @@ doExtend : Semigroup m => ((m -> a) -> b) -> (m -> a) -> (m -> b)
 doExtend mab ma = \m => mab (\m1 => ma (m <+> m1))
 ```
 
-### Enter `Traced`
+## Enter `Traced`
 
 Functions `run` and `doExtend` are part of an interface called
 `Comonad`, the categorical dual to `Monad`. The comonad representing
