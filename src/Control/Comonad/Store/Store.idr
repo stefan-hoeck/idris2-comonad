@@ -35,7 +35,7 @@ runStoreT (MkStoreT wf s) = (wf, s)
 
 public export
 Functor w => Functor (StoreT s w) where
-  map f = record { run $= map (f .) }
+  map f = { run $= map (f .) }
 
 appEnv : (s -> a -> b) -> (s -> a) -> s -> b
 appEnv ff fa s = ff s (fa s)
