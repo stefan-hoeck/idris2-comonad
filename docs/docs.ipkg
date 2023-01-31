@@ -3,6 +3,6 @@ package comonad-doc
 authors    = "stefan-hoeck"
 version    = 0.2.0
 sourcedir  = "src"
-depends    = base >= 0.4.0
+depends    = comonad
 
 modules = Doc.Traced
