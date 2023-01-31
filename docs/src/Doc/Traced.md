@@ -123,7 +123,7 @@ setAll : HeroC c -> HeroBuilder c
 setAll = foldl (flip set)
 ```
 
-Ok, lets build some heroes.
+OK, lets build some heroes.
 
 ```idris
 dummy : (c : Class) -> HeroBuilder c
@@ -163,7 +163,7 @@ male2 : HeroBuilder c -> HeroC c
 male2 b = b [Gender :> Male]
 ```
 
-Ok, that's better, but it still does not compose. What we actually
+OK, that's better, but it still does not compose. What we actually
 need, are functions from builder to builder, which we can
 then concatenate using function composition. Can we use our
 already defined functions in such a new way?

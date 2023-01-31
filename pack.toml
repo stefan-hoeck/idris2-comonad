@@ -1,0 +1,9 @@
+[custom.all.comonad]
+type   = "local"
+path   = "."
+ipkg   = "comonad.ipkg"
+
+[custom.all.comonad-docs]
+type   = "local"
+path   = "docs"
+ipkg   = "docs.ipkg"
