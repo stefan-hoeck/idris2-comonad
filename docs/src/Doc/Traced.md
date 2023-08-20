@@ -131,12 +131,13 @@ dummy c =
   let (sp,sps) = vals
    in setAll (MkHeroC "name" Female Human 0 18 10 10 10 sp sps Nil)
 
-  where vals : (SpellPointsType c, SpellsType c)
-        vals = case c of
-                    Wizard   => (0, [])
-                    Cleric   => (0, [])
-                    Thief    => ((),())
-                    Warrior  => ((),())
+  where
+    vals : (SpellPointsType c, SpellsType c)
+    vals = case c of
+                Wizard   => (0, [])
+                Cleric   => (0, [])
+                Thief    => ((),())
+                Warrior  => ((),())
 
 warrior1 : HeroBuilder Warrior
 warrior1 ss = dummy Warrior (ss <+> [ HitPoint $> (+10)
@@ -177,10 +178,12 @@ runBuilder : HeroBuilder c -> HeroC c
 runBuilder f = f []
 
 orshosh1 : HeroC Warrior
-orshosh1 = runBuilder ( extendBuilder warrior2
-                      . extendBuilder halfOrc2
-                      . extendBuilder male2 $ dummy Warrior
-                      )
+orshosh1 =
+  runBuilder
+    ( extendBuilder warrior2
+    . extendBuilder halfOrc2
+    . extendBuilder male2 $ dummy Warrior
+    )
 ```
 
 That's slightly better. But there seems to be a pattern hidden
@@ -215,31 +218,39 @@ blank : {c : Class} -> Builder c (HeroC c)
 blank {c} = traced (dummy c)
 
 warrior : Builder Warrior a -> a
-warrior = runWith [ HitPoint     $> (+10)
-                  , Strength     $> (+3)
-                  , Intelligence $> (`minus` 3)
-                  , Equipment    $> ("Sword" ::)
-                  ]
+warrior =
+  runWith
+    [ HitPoint     $> (+10)
+    , Strength     $> (+3)
+    , Intelligence $> (`minus` 3)
+    , Equipment    $> ("Sword" ::)
+    ]
 
 wizard : Builder Wizard a -> a
-wizard = runWith [ HitPoint     $> (`minus` 5)
-                 , Strength     $> (`minus` 3)
-                 , Intelligence $> (+3)
-                 , SpellPoints  $> (+ 10)
-                 , Spells       $> (MagicMissiles ::)
-                 ]
+wizard =
+  runWith
+    [ HitPoint     $> (`minus` 5)
+    , Strength     $> (`minus` 3)
+    , Intelligence $> (+3)
+    , SpellPoints  $> (+ 10)
+    , Spells       $> (MagicMissiles ::)
+    ]
 
 halfOrc : Builder c a -> a
-halfOrc = runWith [ Strength     $> (+5)
-                  , Intelligence $> (`minus` 5)
-                  , Race         :> HalfOrc
-                  ]
+halfOrc =
+  runWith
+    [ Strength     $> (+5)
+    , Intelligence $> (`minus` 5)
+    , Race         :> HalfOrc
+    ]
 
 elf : Builder c a -> a
-elf = runWith [ Strength     $> (`minus` 2)
-              , Intelligence $> (+3)
-              , Race         :> Elf
-              ]
+elf =
+  runWith
+    [ Strength     $> (`minus` 2)
+    , Intelligence $> (+3)
+    , Race         :> Elf
+    ]
 
 gender : Gender -> Builder c a -> a
 gender g = runWith [Gender :> g]
@@ -248,18 +259,22 @@ name : String -> Builder c a -> a
 name g = runWith [Name :> g]
 
 orshosh : HeroC Warrior
-orshosh = extract $   blank
-                  =>> warrior
-                  =>> halfOrc
-                  =>> gender Male
-                  =>> name "Orshosh"
+orshosh =
+  extract $
+        blank
+    =>> warrior
+    =>> halfOrc
+    =>> gender Male
+    =>> name "Orshosh"
 
 lucie : HeroC Wizard
-lucie = extract $   blank
-                =>> wizard
-                =>> elf
-                =>> gender Female
-                =>> name "Lucie"
+lucie =
+  extract $
+        blank
+    =>> wizard
+    =>> elf
+    =>> gender Female
+    =>> name "Lucie"
 ```
 
 This, of course, resembles the [Builder Pattern](https://en.wikipedia.org/wiki/Builder_pattern)

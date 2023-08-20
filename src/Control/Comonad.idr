@@ -45,9 +45,11 @@ public export
 Comonad List1 where
   extract = head
   duplicate (x ::: xs) = (x ::: xs) ::: tails xs
-    where tails : List a -> List (List1 a)
-          tails []        = []
-          tails (x :: xs) = (x ::: xs) :: tails xs
+
+    where
+      tails : List a -> List (List1 a)
+      tails []        = []
+      tails (x :: xs) = (x ::: xs) :: tails xs
 
 public export
 Monoid e => Comonad (Morphism e) where
