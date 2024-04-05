@@ -95,7 +95,7 @@ record Setting (c : Class) where
   fld : Field c t
   fun : t -> t
 
-infixr 4 $>, :>
+export infixr 4 $>, :>
 
 ($>) : Field c a -> (a -> a) -> Setting c
 ($>) = Set
