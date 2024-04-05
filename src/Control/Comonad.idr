@@ -60,7 +60,7 @@ Monoid e => Comonad (Morphism e) where
 --          ComonadApply
 --------------------------------------------------------------------------------
 
-infixl 4 <@, @>, <@@>, <@>
+export infixl 4 <@, @>, <@@>, <@>
 
 public export
 interface Comonad w => ComonadApply w where
@@ -104,8 +104,8 @@ ComonadApply Identity where
 --          Utilities
 --------------------------------------------------------------------------------
 
-infixl 1 =>>
-infixr 1 <<=, =<=, =>=
+export infixl 1 =>>
+export infixr 1 <<=, =<=, =>=
 
 ||| `extend` with the arguments swapped. Dual to `>>=` for a `Monad`.
 public export %inline
